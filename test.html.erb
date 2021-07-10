@@ -1,0 +1,42 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  </head>
+  <body>
+    <h1>This is test page</h1>
+    <p><a href = '/about'> About Page</a></p>
+    <% require 'pg' %>
+    <% connection = PG::connect(dbname: "goya") %>
+    <% connection.internal_encoding = "UTF-8" %>
+
+    <form action = 'indicate.cgi' method = 'POST'>
+        <p>Send simple character</p>
+        <input type = "text" name ='input'>
+        <input type = "submit" name ='submittle' value = "Add Character">
+    </form>
+    <br>
+    <% result = connection.exec("select weight, length, give_for from crops;") %>
+    <% data1 = [] %>
+    <% result.each do |record| %>
+      <% data1 << "Goya with Length : #{record["length"]}cm and Weight : #{record["weight"]}g Sale by: #{record["give_for"]}" %>
+    <% end %> 
+    
+    <form action = 'goya.cgi' method = 'POST'>
+        <p>View some informations on Goya </p>
+        <input type = "text" name ='goya' value = "<%= data1.join('<br>')%>" style="display: none;">
+        <input type = "submit" name ='submittle' value = "View Info">
+    </form>
+    <br>
+    <% result_false = connection.exec("select weight, length, give_for from crops where quality = false;") %>
+    <% data_f = [] %>
+    <% result_false.each do |record| %>
+      <% data_f << "Goya with Length : #{record["length"]}cm and Weight : #{record["weight"]}g Sale by: #{record["give_for"]} " %>
+    <% end %> 
+    <br>
+    <form action = 'goya_f.cgi' method = 'POST'>
+        <p>View informations on Goya with false quality</p>
+        <input type = "text" name ='goya_f' value = "<%= data_f.join('<br>')%>" style="display: none;">
+        <input type = "submit" name ='submittle' value = "View Bad Goya">
+    </form>
+  </body>
+</html>
