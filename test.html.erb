@@ -5,6 +5,7 @@
   <body>
     <h1>This is test page</h1>
     <p><a href = '/about'> About Page</a></p>
+    <p>Return to <a href="/"> Welcome page </a>
     <% require 'pg' %>
     <% connection = PG::connect(dbname: "goya") %>
     <% connection.internal_encoding = "UTF-8" %>
@@ -15,27 +16,27 @@
         <input type = "submit" name ='submittle' value = "Add Character">
     </form>
     <br>
-    <% result = connection.exec("select weight, length, give_for from crops;") %>
+    <% result = connection.exec("select weight, length, give_for from crops where not (give_for = '自家消費');") %>
     <% data1 = [] %>
     <% result.each do |record| %>
-      <% data1 << "Goya with Length : #{record["length"]}cm and Weight : #{record["weight"]}g Sale by: #{record["give_for"]}" %>
+      <% data1 << "ゴーヤの大きさ：#{record["weight"]}　売った相手：#{record["give_for"]}" %>
     <% end %> 
     
     <form action = 'goya.cgi' method = 'POST'>
-        <p>View some informations on Goya </p>
-        <input type = "text" name ='goya' value = "<%= data1.join('<br>')%>" style="display: none;">
+        <p>View some informations on Goya where give_for is not '自家消費'. Press this button </p>
+        <input type = "text" name ='goya' value = "<%= data1.join(' ')%>" style="display: none;">
         <input type = "submit" name ='submittle' value = "View Info">
     </form>
     <br>
     <% result_false = connection.exec("select weight, length, give_for from crops where quality = false;") %>
     <% data_f = [] %>
     <% result_false.each do |record| %>
-      <% data_f << "Goya with Length : #{record["length"]}cm and Weight : #{record["weight"]}g Sale by: #{record["give_for"]} " %>
+      <% data_f << "ゴーヤの大きさ：#{record["weight"]}　売った相手：#{record["give_for"]}" %>
     <% end %> 
     <br>
     <form action = 'goya_f.cgi' method = 'POST'>
         <p>View informations on Goya with false quality</p>
-        <input type = "text" name ='goya_f' value = "<%= data_f.join('<br>')%>" style="display: none;">
+        <input type = "text" name ='goya_f' value = "<%= data_f.join(' ')%>" style="display: none;">
         <input type = "submit" name ='submittle' value = "View Bad Goya">
     </form>
   </body>
